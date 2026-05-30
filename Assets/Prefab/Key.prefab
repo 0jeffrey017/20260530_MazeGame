@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 8681789550447544985}
   - component: {fileID: 4400417234671723089}
   - component: {fileID: 4579448244490283392}
+  - component: {fileID: -9044141553225817351}
+  - component: {fileID: -3761288368270778475}
   m_Layer: 0
   m_Name: Key
   m_TagString: Untagged
@@ -90,3 +92,36 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &-9044141553225817351
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986370787613274362}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.95002496
+  m_Center: {x: -0.1860658, y: 0.022766173, z: -0.0000012218952}
+--- !u!114 &-3761288368270778475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986370787613274362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd4cbc0fa67046b69b574b671893055f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Key
