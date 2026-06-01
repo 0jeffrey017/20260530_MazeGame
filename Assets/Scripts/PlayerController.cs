@@ -1,12 +1,14 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [SerializeField] private float playerSpeed = 5.0f;
-    [SerializeField] private float rotationSpeed = 100.0f; // Added for controlled turning
+    [SerializeField] private float rotationSpeed = 100.0f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravityValue = -9.81f;
+    [SerializeField] private Vector3 StartPosition = Vector3.one * 5;
 
     public CharacterController controller;
     private Vector3 playerVelocity;
@@ -16,6 +18,14 @@ public class PlayerController : MonoBehaviour
     public InputActionReference moveAction;
     public InputActionReference jumpAction;
 
+    public override void OnNetworkSpawn()
+    {
+        if (IsClient)
+        {
+            this.transform.position = StartPosition;
+            this.transform.position += Vector3.up;
+        }
+    }
     private void OnEnable()
     {
         moveAction.action.Enable();
@@ -62,9 +72,29 @@ public class PlayerController : MonoBehaviour
 
         // 5. Apply gravity over time
         playerVelocity.y += gravityValue * Time.deltaTime;
-        
-        // 6. Combine movement speed and gravity, then move the controller
-        Vector3 finalFrameMovement = (worldMove * playerSpeed) + (Vector3.up * playerVelocity.y);
+
+        // 6. Prevent tunneling through walls: check horizontal movement with a capsule cast
+        Vector3 horizontalMove = worldMove * playerSpeed;
+        Vector3 horizontalDisplacement = horizontalMove * Time.deltaTime;
+
+        if (horizontalDisplacement.sqrMagnitude > 0.000001f)
+        {
+            // Compute capsule endpoints in world space (based on the CharacterController)
+            Vector3 capsuleCenter = transform.position + controller.center;
+            float capsuleHeight = Mathf.Max(2f * controller.radius, controller.height);
+            Vector3 point1 = capsuleCenter + Vector3.up * (capsuleHeight / 2f - controller.radius);
+            Vector3 point2 = capsuleCenter + Vector3.up * (-capsuleHeight / 2f + controller.radius);
+            float checkDistance = horizontalDisplacement.magnitude + 0.01f;
+
+            if (Physics.CapsuleCast(point1, point2, controller.radius, horizontalDisplacement.normalized, out RaycastHit hit, checkDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                // Obstacle detected ahead — cancel horizontal movement to avoid passing through walls.
+                horizontalMove = Vector3.zero;
+            }
+        }
+
+        // 7. Combine movement speed and gravity, then move the controller
+        Vector3 finalFrameMovement = horizontalMove + Vector3.up * playerVelocity.y;
         controller.Move(finalFrameMovement * Time.deltaTime);
     }
 }
