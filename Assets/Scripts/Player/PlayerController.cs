@@ -12,8 +12,8 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private Vector3 StartPosition = Vector3.one * 5;
 
     public CharacterController controller;
-    private Vector3 playerVelocity;
-    private bool groundedPlayer;
+    private Vector3 _playerVelocity;
+    private bool _groundedPlayer;
 
     [Header("Input Actions")] 
     public InputActionReference moveAction;
@@ -39,14 +39,15 @@ public class PlayerController : NetworkBehaviour
         jumpAction.action.Disable();
     }
 
-    void Update()
-    {
-        groundedPlayer = controller.isGrounded;
+    private void Update()
+    {   
+        if(!IsOwner)return;
+        _groundedPlayer = controller.isGrounded;
 
-        if (groundedPlayer && playerVelocity.y < 0)
+        if (_groundedPlayer && _playerVelocity.y < 0)
         {
             // Keeps the player snapped to the ground without accumulating massive downward velocity
-            playerVelocity.y = -2f;
+            _playerVelocity.y = -2f;
         }
 
         // 1. Read input
@@ -66,13 +67,13 @@ public class PlayerController : NetworkBehaviour
         Vector3 worldMove = transform.TransformDirection(localMove);
 
         // 4. Jump Logic
-        if (groundedPlayer && jumpAction.action.WasPressedThisFrame())
+        if (_groundedPlayer && jumpAction.action.WasPressedThisFrame())
         {
-            playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
+            _playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
         }
 
         // 5. Apply gravity over time
-        playerVelocity.y += gravityValue * Time.deltaTime;
+        _playerVelocity.y += gravityValue * Time.deltaTime;
 
         // 6. Prevent tunneling through walls: check horizontal movement with a capsule cast
         Vector3 horizontalMove = worldMove * playerSpeed;
@@ -95,7 +96,7 @@ public class PlayerController : NetworkBehaviour
         }
 
         // 7. Combine movement speed and gravity, then move the controller
-        Vector3 finalFrameMovement = horizontalMove + Vector3.up * playerVelocity.y;
+        Vector3 finalFrameMovement = horizontalMove + Vector3.up * _playerVelocity.y;
         controller.Move(finalFrameMovement * Time.deltaTime);
     }
 }

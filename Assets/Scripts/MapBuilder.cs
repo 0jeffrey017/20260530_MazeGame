@@ -34,6 +34,8 @@ namespace User.Jeffrey.Scripts.MapGenerator
         private int _mapSize;
         private float _mapCellSize;
         
+        private System.Random _random;
+        
         public MapCell[][] Build()
         {
             return _map;
@@ -46,6 +48,12 @@ namespace User.Jeffrey.Scripts.MapGenerator
         public MapBuilder SetMapCellSize(float mapCellSize)
         {   
             _mapCellSize = mapCellSize;
+            return this;
+        }
+        
+        public MapBuilder SetSeed(int seed)
+        {
+            _random = new System.Random(seed);
             return this;
         }
         public MapBuilder Initialize()
@@ -69,8 +77,8 @@ namespace User.Jeffrey.Scripts.MapGenerator
             int keyCount = 0;
             do
             {   
-                var randomX = Random.Range(1, 9);
-                var randomY = Random.Range(1, 9);
+                var randomX = _random.Next(1, 9);
+                var randomY = _random.Next(1, 9);
                 var randomCell = _map[randomX][randomY];
                 if (!randomCell.HasKey)
                 {
@@ -94,8 +102,8 @@ namespace User.Jeffrey.Scripts.MapGenerator
 
             for (int i = 0; i < 3; i++)
             {
-                var randomX = Random.Range(1, 9);
-                var randomY = Random.Range(1, 9);
+                var randomX = _random.Next(1, 9);
+                var randomY = _random.Next(1, 9);
                 var randomCell = _map[randomX][randomY];
             
                 RemoveWalls(randomCell,_map[randomX][randomY + 1]);
@@ -122,7 +130,7 @@ namespace User.Jeffrey.Scripts.MapGenerator
 
                 if (neighbors.Count > 0)
                 {
-                    MapCell next = neighbors[Random.Range(0, neighbors.Count)];
+                    MapCell next = neighbors[_random.Next(0, neighbors.Count)];
                 
                     RemoveWalls(current, next);
                 
@@ -143,7 +151,7 @@ namespace User.Jeffrey.Scripts.MapGenerator
 
         private List<MapCell> GetUnvisitedNeighbors(MapCell cell)
         {
-            List<MapCell> neighbors = new();
+            List<MapCell> neighbors = new List<MapCell>();
             cell.GetMapIndex(out int x, out int y);
 
             if (x > 0 && !_map[x - 1][y].IsVisited) neighbors.Add(_map[x - 1][y]);//left

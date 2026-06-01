@@ -1,9 +1,10 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace User.Jeffrey.Scripts.MapGenerator
 {
-    public class MapCreator : MonoBehaviour
+    public class MapCreator : NetworkBehaviour
     {
         private MapCell[][] map;
         private const float MAP_CELL_SIZE = 10f;
@@ -16,12 +17,42 @@ namespace User.Jeffrey.Scripts.MapGenerator
         [SerializeField] private GameObject _KeyPrefab;
         [SerializeField] private GameObject _Exitrefab;
         
-        public void Start()
+        private readonly NetworkVariable<int> _mapSeed = new NetworkVariable<int>();
+        
+        public override void OnNetworkSpawn()
         {
+            _mapSeed.OnValueChanged += OnSeedChanged;
+
+            if (IsServer)
+            {
+                int randomSeed = UnityEngine.Random.Range(0, 999999);
+            
+                _mapSeed.Value = randomSeed; 
+            }
+            else
+            {
+                if (_mapSeed.Value != 0)
+                {
+                    GenerateMapFromSeed(_mapSeed.Value);
+                }
+            }
+        }
+        private void OnSeedChanged(int previousValue, int newValue)
+        {
+            GenerateMapFromSeed(newValue);
+        }
+
+        private void GenerateMapFromSeed(int seed)
+        {
+            ClearCurrentMap();
+
+            Debug.Log($"[MapCreator] 開始根據種子 {seed} 生成同步迷宮...");
+            
             MapBuilder builder = new MapBuilder();
 
             map = builder.SetMapSize(10)
                 .SetMapCellSize(10)
+                .SetSeed(seed)
                 .Initialize()
                 .GenerateMap()
                 .GenerateKey()
@@ -29,6 +60,14 @@ namespace User.Jeffrey.Scripts.MapGenerator
                 .Build();
 
             CreateMapView();
+        }
+        
+        private void ClearCurrentMap()
+        {
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
         }
         
         private void CreateMapView()
@@ -98,7 +137,7 @@ namespace User.Jeffrey.Scripts.MapGenerator
         {
             GameObject r = Instantiate(hasRoad ? _roadPrefab : _wallPrefab, parent);
             r.transform.localPosition = localPos;
-            r.name = roadName;
+            // r.name = roadName;
             r.transform.localScale = new Vector3(1,1,0.05f);
             r.transform.localRotation = Quaternion.Euler(rotationX, 90, 0);
         }
