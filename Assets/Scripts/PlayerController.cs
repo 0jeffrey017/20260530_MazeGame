@@ -6,6 +6,7 @@ public class PlayerController : NetworkBehaviour
 {
     [SerializeField] private float playerSpeed = 5.0f;
     [SerializeField] private float rotationSpeed = 100.0f;
+    [SerializeField] private float rotationDeadzone = 0.2f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravityValue = -9.81f;
     [SerializeField] private Vector3 StartPosition = Vector3.one * 5;
@@ -52,10 +53,10 @@ public class PlayerController : NetworkBehaviour
         Vector2 input = moveAction.action.ReadValue<Vector2>();
 
         // 2. Handle Rotation (Turn Left/Right based on X input)
-        if (input.x != 0)
+        if (Mathf.Abs(input.x) > rotationDeadzone)
         {
             float rotationAmount = input.x * rotationSpeed * Time.deltaTime;
-            transform.Rotate(0, rotationAmount, 0);
+            transform.Rotate(0f, rotationAmount, 0f);
         }
 
         // 3. Handle Movement Direction (Forward/Backward based on Y input)
