@@ -8,8 +8,8 @@ namespace User.Jeffrey.Scripts.MapGenerator
     {
         private MapCell[][] map;
         private const float MAP_CELL_SIZE = 10f;
-        private const float ROAD_OFFSET = 0.5f;
-        private const float ROAD_HIGHT_OFFSET = -0.5f;
+        private const float ROAD_OFFSET = 5f;
+        private const float ROAD_HIGHT_OFFSET = 5f;
         
         [SerializeField] private GameObject _mapPrefab;
         [SerializeField] private GameObject _wallPrefab;
@@ -84,62 +84,63 @@ namespace User.Jeffrey.Scripts.MapGenerator
         private void SpawnMapView(MapCell mapCell,bool spawnRoad)
         {
             mapCell.GetMapIndex(out int posX, out int posY);
-                    
+            
             Vector3 worldPos = new Vector3(posX * MAP_CELL_SIZE + MAP_CELL_SIZE/2.0f,
                 0,
                 posY * MAP_CELL_SIZE + MAP_CELL_SIZE/2.0f);
-            var g = Instantiate(_mapPrefab);
-            g.transform.localScale = new Vector3(MAP_CELL_SIZE,MAP_CELL_SIZE,MAP_CELL_SIZE);
-            g.transform.position = worldPos;
-            g.transform.rotation = Quaternion.Euler(90, 0, 0);
-            g.name = $"Map {posX}/{posY}";
+            GameObject gParent = new GameObject($"Map {posX}/{posY}");
+            gParent.transform.position = worldPos;
+            Transform gTransform = gParent.transform;
+            
+            var g = Instantiate(_mapPrefab,gTransform);
+            var ceiling = Instantiate(_mapPrefab,gTransform);
+            g.transform.localScale = new Vector3(MAP_CELL_SIZE,0.1f,MAP_CELL_SIZE);
+            ceiling.transform.localScale = new Vector3(MAP_CELL_SIZE,0.1f,MAP_CELL_SIZE);
+            ceiling.transform.localPosition += Vector3.up * MAP_CELL_SIZE;
             if (mapCell.HasKey)
             {
-                SpawnKey(g.transform);
+                SpawnKey(gTransform);
             }
-
             if (mapCell.IsExit)
             {
-                SpawnExit(g.transform);
+                SpawnExit(gTransform);
             }
             if (spawnRoad)
             {
-                SpawnRoadWithMapCell(mapCell,g.transform);
+                SpawnRoadWithMapCell(mapCell,gTransform);
             }
         }
 
         private void SpawnExit(Transform gTransform)
         {
             GameObject r = Instantiate(_Exitrefab, gTransform);
-            r.transform.rotation = Quaternion.Euler(0, 0, 0);
-            r.transform.localScale = Vector3.one * 0.2f;
-            r.transform.localPosition = new Vector3(0, 0, -0.5f);
+            r.transform.localScale = Vector3.one * 2.0f;
             r.name = "Exit";
         }
 
         private void SpawnKey(Transform gTransform)
         {
             GameObject r = Instantiate(_KeyPrefab, gTransform);
-            r.transform.localScale = Vector3.one * 0.1f;
-            r.transform.localPosition = new Vector3(0, 0, -0.6f);
+            r.transform.localScale = Vector3.one;
+            r.transform.localPosition = new Vector3(0, 2, 0);
             r.name = "Key";
         }
 
         private void SpawnRoadWithMapCell(MapCell mapCell,Transform parent)
         {
-            SpawnRoadIfHas(mapCell.HasUpRoad, "Up", new Vector3(0, ROAD_OFFSET,ROAD_HIGHT_OFFSET), 90, parent);
-            SpawnRoadIfHas(mapCell.HasDownRoad, "Down", new Vector3(0, -ROAD_OFFSET, ROAD_HIGHT_OFFSET), 90, parent);
-            SpawnRoadIfHas(mapCell.HasLeftRoad, "Left", new Vector3(-ROAD_OFFSET, 0, ROAD_HIGHT_OFFSET), 0, parent);
-            SpawnRoadIfHas(mapCell.HasRightRoad, "Right", new Vector3(ROAD_OFFSET, 0, ROAD_HIGHT_OFFSET), 0, parent);
+            SpawnRoadIfHas(mapCell.HasUpRoad, "Up", new Vector3(0, ROAD_HIGHT_OFFSET,ROAD_OFFSET),0, parent);
+            SpawnRoadIfHas(mapCell.HasDownRoad, "Down", new Vector3(0, ROAD_HIGHT_OFFSET, -ROAD_OFFSET),0, parent);
+            SpawnRoadIfHas(mapCell.HasLeftRoad, "Left", new Vector3(-ROAD_OFFSET, ROAD_HIGHT_OFFSET, 0),90, parent);
+            SpawnRoadIfHas(mapCell.HasRightRoad, "Right", new Vector3(ROAD_OFFSET, ROAD_HIGHT_OFFSET, 0),90, parent);
         }
         
-        private void SpawnRoadIfHas(bool hasRoad, string roadName, Vector3 localPos, float rotationX, Transform parent)
+        private void SpawnRoadIfHas(bool hasRoad, string roadName, Vector3 localPos ,float rotation,Transform parent)
         {
             GameObject r = Instantiate(hasRoad ? _roadPrefab : _wallPrefab, parent);
             r.transform.localPosition = localPos;
-            // r.name = roadName;
-            r.transform.localScale = new Vector3(1,1,0.05f);
-            r.transform.localRotation = Quaternion.Euler(rotationX, 90, 0);
+            r.transform.rotation = Quaternion.Euler(0, rotation, 0);
+            r.name = roadName;
+            r.transform.localScale = new Vector3(10,10,0.1f);
         }
     }
 }
