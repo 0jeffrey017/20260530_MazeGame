@@ -2,10 +2,10 @@ using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace User.Jeffrey.Scripts.Player
+namespace Player
 {
     public class PlayerCameraFollower : NetworkBehaviour
-    {
+    {   
         public override void OnNetworkSpawn()
         {
             if (IsOwner)

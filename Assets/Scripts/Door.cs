@@ -1,13 +1,24 @@
+using Network;
+using Unity.Netcode;
 using UnityEngine;
+using VContainer;
 
-public class Door : MonoBehaviour, IInteractable
-{
+public class Door : NetworkBehaviour, IInteractable
+{   
+    private NetworkObjectSpawner _networkObjectSpawner;
+    private GameMode _gameMode;
+    
+    [Inject]
+    public void Construct(NetworkObjectSpawner spawner,GameMode gameMode)
+    {
+        _networkObjectSpawner = spawner;
+        _gameMode = gameMode;
+    }
     public void Interact()
     {
-        if (GlobalFlag.CanDoorOpen.CurrentValue)
+        if (_gameMode.HaveKey.Value)
         {
-            Debug.Log("Door is open");
-            Debug.Log("Game Clear");
+            Debug.Log("Door Interact");
         }
     }
 }
