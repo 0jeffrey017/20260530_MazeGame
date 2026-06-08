@@ -20,6 +20,8 @@ namespace Network
             Quaternion rotation = default,
             Vector3 scale = default)
         {
+            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) 
+                return null;
             
             GameObject instance = parent == null ? Instantiate(obj) : Instantiate(obj, parent);
             instance.transform.position = parent == null ? position : parent.position + position;
