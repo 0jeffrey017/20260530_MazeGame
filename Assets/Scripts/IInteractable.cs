@@ -2,5 +2,5 @@ using R3;
 
 public interface IInteractable
 {
-    void Interact();
+    void Interact(ulong id);
 }

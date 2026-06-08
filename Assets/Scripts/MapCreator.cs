@@ -45,6 +45,11 @@ public class MapCreator : NetworkBehaviour
             }
         }
     }
+
+    public override void OnNetworkDespawn()
+    {
+        _mapSeed.OnValueChanged -= OnSeedChanged;
+    }
     private void OnSeedChanged(int previousValue, int newValue)
     {
         GenerateMapFromSeed(newValue);
@@ -54,7 +59,7 @@ public class MapCreator : NetworkBehaviour
     {
         ClearCurrentMap();
 
-        Debug.Log($"[MapCreator] 開始根據種子 {seed} 生成同步迷宮...");
+        Debug.Log($"[MapCreator] GenerateMapFromSeed seed:{seed} ");
             
         MapBuilder builder = new MapBuilder();
 
@@ -82,9 +87,9 @@ public class MapCreator : NetworkBehaviour
     {
         foreach (var mapX in map)
         {
-            foreach (var MapY in mapX)
+            foreach (var mapY in mapX)
             {
-                SpawnMapView(MapY, true);
+                SpawnMapView(mapY, true);
             }
         }
     }
@@ -121,12 +126,12 @@ public class MapCreator : NetworkBehaviour
 
     private void SpawnExit(Transform gTransform)
     {   
-        _spawner.SpawnNetworkObject(_Exitrefab, gTransform,scale:Vector3.one * 2.0f);
+        _spawner.SpawnNetworkObject(_Exitrefab, parent:gTransform,scale:Vector3.one * 2.0f);
     }
 
     private void SpawnKey(Transform gTransform)
     {   
-        _spawner.SpawnNetworkObject(_KeyPrefab, gTransform,new Vector3(0, 2, 0));
+        _spawner.SpawnNetworkObject(_KeyPrefab, parent:gTransform,position:new Vector3(0, 2, 0));
     }
 
     private void SpawnRoadWithMapCell(MapCell mapCell,Transform parent)

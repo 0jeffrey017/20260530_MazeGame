@@ -1,5 +1,6 @@
 using Network;
 using Player;
+using UI;
 using Unity.Cinemachine;
 using UnityEngine;
 using VContainer;
@@ -14,5 +15,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<NetworkObjectSpawner>();
         builder.RegisterComponentInHierarchy<GameMode>();
         builder.RegisterComponentInHierarchy<MapCreator>();
+        builder.RegisterComponentInHierarchy<PlayerInit>();
+        builder.RegisterComponentInHierarchy<MainUIController>();
     }
 }

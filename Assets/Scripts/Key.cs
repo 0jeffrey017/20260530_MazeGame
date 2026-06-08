@@ -15,7 +15,6 @@ public class Key : NetworkBehaviour, IInteractable
     {
         _networkObjectSpawner = spawner;
         _gameMode = gameMode;
-        Debug.Log($"[Key] 透過 VContainer 成功注入！");
     }
     
     public override void OnNetworkSpawn()
@@ -25,41 +24,39 @@ public class Key : NetworkBehaviour, IInteractable
             .Bind(v => transform.rotation = Quaternion.Euler(0, v, 0));
     }
 
-    public void Interact()
-    {
+    public void Interact(ulong id)
+    {   
         if (IsServer)
         {
-            ProcessPickup();
+            ProcessPickup(id);
         }
         else
         {
-            RequestPickupServerRpc();
+            RequestPickupServerRpc(id);
         }
     }
     
     [Rpc(SendTo.Server)]
-    private void RequestPickupServerRpc()
+    private void RequestPickupServerRpc(ulong id)
     {
-        ProcessPickup();
+        ProcessPickup(id);
     }
-
-    // 伺服器核心處理邏輯
-    private void ProcessPickup()
+    
+    private void ProcessPickup(ulong id)
     {   
         if (_gameMode == null)
         {
-            Debug.LogError($"[Key Error] Server端的 _gameMode 是 null！物件名稱: {gameObject.name}", this);
+            Debug.LogError($"[Key Error] Server _gameMode is null！{gameObject.name}", this);
             return;
         }
-
         if (_networkObjectSpawner == null)
         {
-            Debug.LogError($"[Key Error] Server端的 _networkObjectSpawner 是 null！物件名稱: {gameObject.name}", this);
+            Debug.LogError($"[Key Error] Server _networkObjectSpawner is null！ {gameObject.name}", this);
             return;
         }
         if (_gameMode != null)
         {
-            _gameMode.SetHaveKey(true);
+            _gameMode.KeyChanged(true);
         }
         if (NetworkObject != null && NetworkObject.IsSpawned)
         {
