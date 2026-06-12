@@ -10,7 +10,8 @@ public class MapCreator : NetworkBehaviour
     private const float MAP_CELL_SIZE = 10f;
     private const float ROAD_OFFSET = 5f;
     private const float ROAD_HIGHT_OFFSET = 5f;
-        
+
+    [SerializeField] private int mapSize = 5;
     [SerializeField] private GameObject _mapPrefab;
     [SerializeField] private GameObject _wallPrefab;
     [SerializeField] private GameObject _roadPrefab;
@@ -63,8 +64,8 @@ public class MapCreator : NetworkBehaviour
             
         MapBuilder builder = new MapBuilder();
 
-        map = builder.SetMapSize(10)
-            .SetMapCellSize(10)
+        map = builder.SetMapSize(mapSize)
+            .SetMapCellSize(MAP_CELL_SIZE)
             .SetSeed(seed)
             .Initialize()
             .GenerateMap()
@@ -126,12 +127,12 @@ public class MapCreator : NetworkBehaviour
 
     private void SpawnExit(Transform gTransform)
     {   
-        _spawner.SpawnNetworkObject(_Exitrefab, parent:gTransform,scale:Vector3.one * 2.0f);
+        _spawner.SpawnNetworkObject<Door>(_Exitrefab, parent:gTransform,scale:Vector3.one * 2.0f);
     }
 
     private void SpawnKey(Transform gTransform)
     {   
-        _spawner.SpawnNetworkObject(_KeyPrefab, parent:gTransform,position:new Vector3(0, 2, 0));
+        _spawner.SpawnNetworkObject<Key>(_KeyPrefab, parent:gTransform,position:new Vector3(0, 2, 0));
     }
 
     private void SpawnRoadWithMapCell(MapCell mapCell,Transform parent)

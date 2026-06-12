@@ -74,19 +74,12 @@ namespace User.Jeffrey.Scripts.MapGenerator
 
         public MapBuilder GenerateKey()
         {
-            int keyCount = 0;
-            do
-            {   
-                var randomX = _random.Next(1, 9);
-                var randomY = _random.Next(1, 9);
-                var randomCell = _map[randomX][randomY];
-                if (!randomCell.HasKey)
-                {
-                    randomCell.HasKey = true;
-                    keyCount++;
-                }
-            } while (keyCount <= 3);
+              
+            var randomX = _random.Next(1, _mapSize - 1);
+            var randomY = _random.Next(1, _mapSize - 1);
+            var randomCell = _map[randomX][randomY];
             
+            randomCell.HasKey = true;
             return this;
         }
         
@@ -102,8 +95,8 @@ namespace User.Jeffrey.Scripts.MapGenerator
 
             for (int i = 0; i < 3; i++)
             {
-                var randomX = _random.Next(1, 9);
-                var randomY = _random.Next(1, 9);
+                var randomX = _random.Next(1, _mapSize - 1);
+                var randomY = _random.Next(1, _mapSize - 1);
                 var randomCell = _map[randomX][randomY];
             
                 RemoveWalls(randomCell,_map[randomX][randomY + 1]);

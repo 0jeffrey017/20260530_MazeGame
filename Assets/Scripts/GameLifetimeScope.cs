@@ -8,7 +8,6 @@ using VContainer.Unity;
 
 public class GameLifetimeScope : LifetimeScope
 {   
-    [SerializeField] private CinemachineCamera playerCamera;
     protected override void Configure(IContainerBuilder builder)
     {
         // builder.RegisterComponent(NetworkManager.Singleton);
@@ -17,5 +16,6 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponentInHierarchy<MapCreator>();
         builder.RegisterComponentInHierarchy<PlayerInit>();
         builder.RegisterComponentInHierarchy<MainUIController>();
+        builder.RegisterComponentInHierarchy<GameClearView>();
     }
 }

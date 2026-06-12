@@ -14,7 +14,7 @@ namespace Network
             _container = container;
         }
 
-        public GameObject SpawnNetworkObject(GameObject obj,
+        public GameObject SpawnNetworkObject<T>(GameObject obj,
             Transform parent = null,
             Vector3 position = default,
             Quaternion rotation = default,
@@ -28,15 +28,10 @@ namespace Network
             instance.transform.rotation = rotation == default ? Quaternion.identity : rotation;
             instance.transform.localScale = scale == default ? Vector3.one : scale;
             
-            if(instance.TryGetComponent<Key>(out var key))
+            if(instance.TryGetComponent<T>(out var component))
             {
-                 _container.Inject(key);
+                 _container.Inject(component);
             }
-            if(instance.TryGetComponent<Door>(out var door))
-            {
-                _container.Inject(door);
-            }
-           
 
             var netObj = instance.GetComponent<NetworkObject>();
             if(netObj != null)
